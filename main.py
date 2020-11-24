@@ -1,8 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from calculator import *
-
+import calculator
 
 class MainApp(Tk):
 
@@ -13,22 +12,11 @@ class MainApp(Tk):
         self.display = calculator.Display (self)
         self.display.pack (side = TOP, fill = BOTH, expand = True)
 
-        self.teclado = ttk.Frame (self, width = calculator.WIDTH *4, height = calculator.HEIGHT *5)
-        self.teclado.grid_propagate(0)
-        self.teclado.pack (side = TOP, fill = BOTH, expand = True)
-
-        botonC = calculator.Calcbutton(self.teclado, 'C')
-        botonC.grid (row = 0, column = 0)
-
-        botonC = calculator.Calcbutton(self.teclado, '+/-')
-        botonC.grid (row = 0, column = 1)
-
-        botonC = calculator.Calcbutton(self.teclado, '%')
-        botonC.grid (row = 0, column = 2)
-
-        botonC = calculator.Calcbutton(self.teclado, '+')
-        botonC.grid (row = 0, column = 3)
-
+        self.teclado = calculator.Keyboard_con_diccionario(self, self.display.refresh)
+        self.teclado.pack (side = TOP)
+    
+                   
+            
 
         # Creacion de botones sin crear la clase Calcbutton.
         """
@@ -51,8 +39,15 @@ class MainApp(Tk):
         self.calcbotondiv.grid (column=3, row=1)
         """
 
+        """
+        def procesar ():
+            if num -> pon num en display
+            if + -> suma
+            if - -> resta
+            if X -> multiplica
+            if / -> divide
         
-        
+        """
 
 
 if __name__ == '__main__':   
