@@ -9,12 +9,8 @@ class MainApp(Tk):
         Tk.__init__(self)
         self.title ('Calculadora Romanos') #Titulo de la pantalla
         
-        self.display = calculator.Display (self)
-        self.display.pack (side = TOP, fill = BOTH, expand = True)
-
-        self.teclado = calculator.Keyboard_con_diccionario(self, self.display.refresh)
-        self.teclado.pack (side = TOP)
-    
+        self.calculator = calculator.Calculator(self)
+        self.calculator.pack(side = TOP)
                    
             
 

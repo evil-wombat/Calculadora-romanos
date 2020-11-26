@@ -102,7 +102,7 @@ dbotones = [
 
 # Command no acepta una función con parametros, solo una funcion vacia. Por lo que creamos una función lambda.
 def retornaCaracter (tecla):
-    print (tecla)
+    return (tecla)
     
 
 class Display (ttk.Frame):
@@ -110,8 +110,7 @@ class Display (ttk.Frame):
     def  __init__ (self, parent):
         ttk.Frame.__init__(self, parent, width = WIDTH*4, height = HEIGHT)
         self.pack_propagate (0)
-        s = ttk.Style ()
-        s.theme_use('alt')
+        
 
         self.label = ttk.Label (self, text = '0', anchor = E, background = 'black', foreground = 'white', font = 'Helvetica 36')
         self.label.pack (side = TOP, fill = BOTH, expand = True)
@@ -123,8 +122,7 @@ class CalcButton (ttk.Frame):
     def __init__ (self, parent, text, command = None, width = 1, height = 1):
         ttk.Frame.__init__(self, parent, width = width*WIDTH, height = height*HEIGHT)
         self.pack_propagate (0)
-        s = ttk.Style()
-        s.theme_use ('alt')
+        
 
         ttk.Button (self, text = text, command = lambda: command(text)).pack (side = TOP, fill = BOTH, expand = True)
 
@@ -133,8 +131,7 @@ class Keyboard_Adrian (ttk.Frame):
     def __init__ (self, parent, command):
         ttk.Frame.__init__(self, parent, width = 4*WIDTH, height = 5*HEIGHT)
         self.pack_propagate (0)
-        s = ttk.Style()
-        s.theme_use ('alt')
+        
 
         row = 0
         column = 0
@@ -157,8 +154,7 @@ class Keyboard2 (ttk.Frame):
      def __init__(self, parent, command):
         ttk.Frame.__init__(self, parent, width=WIDTH*4, height=HEIGHT*5)
         self.pack_propagate(0)
-        s = ttk.Style()
-        s.theme_use('alt')
+       
 
         coordenadas = []
         for fila in range(5):
@@ -175,8 +171,7 @@ class Keyboard_con_diccionario(ttk.Frame):
     def __init__(self, parent, command):
         ttk.Frame.__init__(self, parent, width=WIDTH*4, height=HEIGHT*5)
         self.pack_propagate(0)
-        s = ttk.Style()
-        s.theme_use('alt')
+       
 
         for boton in dbotones:
             w = boton.get('w', 1)
@@ -185,25 +180,72 @@ class Keyboard_con_diccionario(ttk.Frame):
             btn = CalcButton(self, boton['text'],width=w, height=h, command = command)
             btn.grid(row=boton['r'], column=boton['c'], columnspan=w, rowspan=h)
 
+
 class Calculator (ttk.Frame):
+    op1 = None
+    op2 = None
+    resultado = None
+    operador = ''
+    cadena = ''
+    
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent, width=WIDTH*4, height=HEIGHT*6)
         self.pack_propagate(0)
+        # El estilo solo hay que ponerlo en el padre de todos los widgets.
         s = ttk.Style()
         s.theme_use('alt')
 
-        self.display = calculator.Display (self)
+        self.display = Display (self)
         self.display.pack (side = TOP, fill = BOTH, expand = True)
 
-        self.teclado = calculator.Keyboard_con_diccionario(self, self.display.refresh)
+        self.teclado = Keyboard_con_diccionario(self, self.gestiona_calculos)
         self.teclado.pack (side = TOP)
 
     def gestiona_calculos (self, tecla):
-         
-        """
-         OP1
-         OP2
-         operacion
-         resultado
-        """
-        pass
+
+        if tecla.isdigit():
+            if self.cadena != '' or tecla != '0':
+                self.cadena += tecla
+                self.display.refresh (self.cadena)
+        
+        elif tecla in ('+', '-', 'x', '÷'):
+            if not self.op1:
+                self.op1 = int(self.cadena)
+                self.cadena = ''
+                self.operador = tecla
+            else:
+                if not self.cadena:
+                    return
+                self.op2 = int(self.cadena)
+                self.resultado = self.calculate()
+                self.display.refresh (self.resultado)
+                self.op1 = self.resultado
+            self.cadena = ''
+
+        elif tecla == '=':
+            if not self.cadena:
+                return
+            self.op2 = int(self.cadena)
+            self.resultado = self.calculate()
+            self.display.refresh (self.resultado)
+            self.op1 = self.resultado
+            self.cadena =''
+        
+        elif tecla == 'C':
+            self.op1 = None
+            self.op2 = None
+            self.resultado = None
+            self.operador = ''
+            self.cadena = ''
+            self.display.refresh('0')
+
+    def calculate (self):
+        if self.operador == '+':
+            return self.op1 + self.op2
+        elif self.operador == '-':
+            return self.op1 - self.op2
+        elif self.operador == 'x':
+            return self.op1 * self.op2
+        elif self.operador == '÷':
+            return self.op1 / self.op2
+        
