@@ -89,7 +89,7 @@ dbotones = [
         'w': 2
     },
     {
-        'text': ',',
+        'text': '.',
         'r': 4,
         'c': 2,
     },
@@ -200,6 +200,12 @@ class Calculator (ttk.Frame):
 
         self.teclado = Keyboard_con_diccionario(self, self.gestiona_calculos)
         self.teclado.pack (side = TOP)
+    
+    def formatNumber (self, numero):
+        if numero == int(numero):
+            return int(numero)
+        else:
+            return numero
 
     def gestiona_calculos (self, tecla):
 
@@ -207,29 +213,42 @@ class Calculator (ttk.Frame):
             if self.cadena != '' or tecla != '0':
                 self.cadena += tecla
                 self.display.refresh (self.cadena)
-        
-        elif tecla in ('+', '-', 'x', '÷'):
+
+        elif tecla == '.' and '.' not in self.cadena:
+            if self.cadena == '':
+                self.cadena = self.cadena + '0'
+            self.cadena += tecla
+            self.display.refresh (self.formatNumber(self.resultado))
+
+            # self.cadena += tecla if cadena != '' else ('0' + tecla) <-- Triple if.
+
+        elif tecla in tuple('+-x÷'):
             if not self.op1:
-                self.op1 = int(self.cadena)
-                self.cadena = ''
                 self.operador = tecla
+                self.op1 = float(self.cadena)
+                self.cadena = ''
             else:
                 if not self.cadena:
+                    self.operador = tecla
                     return
-                self.op2 = int(self.cadena)
+                self.op2 = float(self.cadena)
                 self.resultado = self.calculate()
-                self.display.refresh (self.resultado)
+                self.operador = tecla
+                self.display.refresh (self.formatNumber(self.resultado))
                 self.op1 = self.resultado
+
             self.cadena = ''
 
         elif tecla == '=':
             if not self.cadena:
                 return
-            self.op2 = int(self.cadena)
+            self.op2 = float(self.cadena)
             self.resultado = self.calculate()
-            self.display.refresh (self.resultado)
+            self.display.refresh (self.formatNumber(self.resultado))
+            self.operador = ''
             self.op1 = self.resultado
-            self.cadena =''
+            self.cadena = ''
+            
         
         elif tecla == 'C':
             self.op1 = None
@@ -248,4 +267,7 @@ class Calculator (ttk.Frame):
             return self.op1 * self.op2
         elif self.operador == '÷':
             return self.op1 / self.op2
+        else:
+            print ('Error de operador')
+            return 'E'
         
